@@ -1,0 +1,30 @@
+{
+  "name": "jsdom-screenshot",
+  "version": "0.0.1",
+  "description": "Generate screenshots of jsdom",
+  "main": "index.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/dferber90/jsdom-screenshot.git"
+  },
+  "keywords": [
+    "jsdom",
+    "screenshot",
+    "snapshot",
+    "puppeteer",
+    "image"
+  ],
+  "author": "Dominik Ferber",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/dferber90/jsdom-screenshot/issues"
+  },
+  "dependencies": {
+    "lodash.merge": "^4.6.1",
+    "pretty-format": "23.6.0",
+    "puppeteer": "^1.4.0"
+  },
+  "engines": {
+    "node": ">=8"
+  }
+}
