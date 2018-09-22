@@ -1,6 +1,6 @@
 {
   "name": "jsdom-screenshot",
-  "version": "0.0.1",
+  "version": "1.0.0",
   "description": "Generate screenshots of jsdom",
   "main": "index.js",
   "repository": {
