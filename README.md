@@ -14,6 +14,7 @@ This package will only give you the image, you'll have to diff it with something
 - [Usage](#usage)
   - [Options](#options)
     - [`options.launch`](#-optionslaunch-)
+    - [`options.screenshot`](#-optionsscreenshot-)
     - [`options.debug`](#-optionsdebug-)
     - [`options.viewport`](#-optionsviewport-)
     - [`options.waitForResources`](#-optionswaitforresources-)
@@ -53,8 +54,10 @@ generateImage(component, options);
 
 ```js
 options = {
-  // Options that are passed to Puppeteer (puppeteer.launch(options))
+  // Options used to launch Puppeteer (puppeteer.launch(options))
   launch: {},
+  // Options used to take a screenshot (puppeteer.screenshot(options))
+  screenshot: {},
   // Prints the jsdom markup to the console before taking the screenshot
   debug: true,
   // Wait for resources to be loaded before taking the screenshot
@@ -68,7 +71,11 @@ options = {
 
 #### `options.launch`
 
-`launch` are passed to `puppeteer.launch([options])`, see [`docs`](https://github.com/GoogleChrome/puppeteer/blob/master/docs/api.md#puppeteerlaunch).
+`launch` options are passed to `puppeteer.launch([options])`, see [`docs`](https://github.com/GoogleChrome/puppeteer/blob/master/docs/api.md#puppeteerlaunch).
+
+#### `options.screenshot`
+
+`screenshot` options are passed to `page.screenshot([options])`, see [`docs`](https://github.com/GoogleChrome/puppeteer/blob/master/docs/api.md#pagescreenshotoptions).
 
 #### `options.debug`
 

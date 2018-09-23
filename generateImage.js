@@ -31,7 +31,7 @@ const takeScreenshot = async (html, opts) => {
     await page.setContent(html);
   }
 
-  const image = await page.screenshot();
+  const image = await page.screenshot(opts.screenshot);
   browser.close();
 
   return image;
@@ -39,7 +39,8 @@ const takeScreenshot = async (html, opts) => {
 
 const defaultOpts = {
   waitForResources: true,
-  launch: {}
+  launch: {},
+  screenshot: undefined
 };
 
 const generateImage = async options => {
