@@ -63,7 +63,7 @@ const takeScreenshot = async (url, opts) => {
   const page = await browser.newPage();
 
   if (typeof opts.intercept === "function") {
-    await page.setintercept(true);
+    await page.setRequestInterception(true);
     page.on("request", opts.intercept);
   }
 
