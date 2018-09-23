@@ -19,7 +19,7 @@ This package will only give you the image, you'll have to diff it with something
     - [`options.debug`](#-optionsdebug-)
     - [`options.viewport`](#-optionsviewport-)
     - [`options.waitUntilNetworkIdle`](#-optionswaituntilnetworkidle-)
-    - [`options.requestInterception`](#-optionsrequestinterception-)
+    - [`options.intercept`](#-optionsintercept-)
   - [Changing viewport](#changing-viewport)
 - [How it works](#how-it-works)
   - [High level](#high-level)
@@ -68,7 +68,7 @@ options = {
   // Shortcut to set launch.defaultViewport
   viewport: {},
   // Enables request interception
-  requestInterception: () => {}
+  intercept: () => {}
 };
 ```
 
@@ -101,9 +101,9 @@ This is a shortcut to set `options.launch.defaultViewport`. `options.launch.defa
 When set to `true`, `jsdom-screenshot` will wait until the network becomes idle (all resources are loaded) before taking a screenshot.
 You can use this to ensure that all resources are loaded before the screenshot is taken.
 
-It is disabled by default as it adds roughly one second to each screenshot. Use it wisely to avoid slowing down tests unnecessarily. You can mock requests using [`options.requestInterception`](#-optionsrequestinterception-).
+It is disabled by default as it adds roughly one second to each screenshot. Use it wisely to avoid slowing down tests unnecessarily. You can mock requests using [`options.intercept`](#-optionsintercept-).
 
-#### `options.requestInterception`
+#### `options.intercept`
 
 When provided, `puppeteer`'s request interception will be enabled. The provided function will be called with the intercepted request.
 
@@ -113,7 +113,7 @@ This can be used to speed up tests by stubbing requests.
 
 ```js
 generateImage({
-  requestInterception: request => {
+  intercept: request => {
     if (request.url().endsWith(".png") || request.url().endsWith(".jpg")) {
       // Blocks some images.
       request.abort();
@@ -132,7 +132,7 @@ generateImage({
 });
 ```
 
-See [`page.setRequestInterception`](https://github.com/GoogleChrome/puppeteer/blob/master/docs/api.md#pagesetrequestinterceptionvalue) of `puppeteer`.
+See [`page.setintercept`](https://github.com/GoogleChrome/puppeteer/blob/master/docs/api.md#pagesetinterceptvalue) of `puppeteer`.
 
 ### Changing viewport
 
@@ -175,7 +175,7 @@ It then returns that screenshot.
 
 ## Performance
 
-Launching `puppeteer` to take a screenshot takes around 750ms. The rest depends on your application. You should try to mock/stub network requests to keep tests fast (see [`options.requestInterception`](#-optionsrequestinterception-)).
+Launching `puppeteer` to take a screenshot takes around 750ms. The rest depends on your application. You should try to mock/stub network requests to keep tests fast (see [`options.intercept`](#-optionsintercept-)).
 
 You should not go overboard with Visual Regression Tests, but a few errors caught with
 good Visual Regression Tests will make up for the lost time in tests. Find a good balance that works for you.

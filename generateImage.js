@@ -62,9 +62,9 @@ const takeScreenshot = async (url, opts) => {
   const browser = await puppeteer.launch(opts.launch);
   const page = await browser.newPage();
 
-  if (typeof opts.requestInterception === "function") {
-    await page.setRequestInterception(true);
-    page.on("request", opts.requestInterception);
+  if (typeof opts.intercept === "function") {
+    await page.setintercept(true);
+    page.on("request", opts.intercept);
   }
 
   await page.goto(
