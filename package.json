@@ -1,6 +1,6 @@
 {
   "name": "jsdom-screenshot",
-  "version": "2.0.0",
+  "version": "2.1.0",
   "description": "Generate screenshots of jsdom",
   "main": "index.js",
   "repository": {
@@ -20,9 +20,12 @@
     "url": "https://github.com/dferber90/jsdom-screenshot/issues"
   },
   "dependencies": {
+    "connect": "3.6.6",
+    "finalhandler": "1.1.1",
     "lodash.merge": "^4.6.1",
     "pretty-format": "23.6.0",
-    "puppeteer": "^1.4.0"
+    "puppeteer": "^1.4.0",
+    "serve-static": "1.13.2"
   },
   "engines": {
     "node": ">=8"

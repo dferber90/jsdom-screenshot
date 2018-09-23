@@ -15,6 +15,7 @@ This package will only give you the image, you'll have to diff it with something
   - [Options](#options)
     - [`options.launch`](#-optionslaunch-)
     - [`options.screenshot`](#-optionsscreenshot-)
+    - [`options.publicPaths`](#-optionspublicpaths-)
     - [`options.debug`](#-optionsdebug-)
     - [`options.viewport`](#-optionsviewport-)
     - [`options.waitForResources`](#-optionswaitforresources-)
@@ -58,6 +59,8 @@ options = {
   launch: {},
   // Options used to take a screenshot (puppeteer.screenshot(options))
   screenshot: {},
+  // An array of folders containing static files to be served
+  publicPaths: ["pubilc", "assets"],
   // Prints the jsdom markup to the console before taking the screenshot
   debug: true,
   // Wait for resources to be loaded before taking the screenshot
@@ -76,6 +79,12 @@ options = {
 #### `options.screenshot`
 
 `screenshot` options are passed to `page.screenshot([options])`, see [`docs`](https://github.com/GoogleChrome/puppeteer/blob/master/docs/api.md#pagescreenshotoptions).
+
+#### `options.publicPaths`
+
+`publicPaths` is an array of strings. You can provide a list of folders to serve statically. This is useful when your component uses assets through relative links like `<img src="/party-parrot.gif" />`.
+
+In this case, you could provide `publicPaths: ["images"]` when the `images` folder at the root of your project (where you launch the tests from) contains `party-parrot.gif`.
 
 #### `options.debug`
 
@@ -148,11 +157,18 @@ See [`launch.defaultViewport`](https://github.com/GoogleChrome/puppeteer/blob/ma
 
 ### High level
 
-[`jsdom`](https://github.com/jsdom/jsdom) is an emulator of a subset of browser features. `jsdom` does not have the capability to render visual content, and will act like a headless browser by default. `jsdom` does not do any layout or rendering [ref](https://github.com/jsdom/jsdom#pretending-to-be-a-visual-browser). We use `jsdom` to obtain the state of the HTML which we want to take a screenshot of. Consumers can use `jsdom` to easily get components into the state they want to take a screenshot of. `jsdom-screenshot` then uses the HTML at that moment (of that state) and sends it to [`puppeteer`](https://github.com/googlechrome/puppeteer/). `puppeteer` runs a headless Google Chrome and can take screenshots as well. So we send the markup to `puppeteer` and take a screenshot of it.
+[`jsdom`](https://github.com/jsdom/jsdom) is an emulator of a subset of browser features. `jsdom` does not have the capability to render visual content, and will act like a headless browser by default. `jsdom` does not do any layout or rendering [ref](https://github.com/jsdom/jsdom#pretending-to-be-a-visual-browser). We use `jsdom` to obtain the state of the HTML which we want to take a screenshot of. Consumers can use `jsdom` to easily get components into the state they want to take a screenshot of. `jsdom-screenshot` then uses the markup ("the HTML") at that moment (of that state). `jsdom-screenshot` launches a local webserver and serves the obtained markup as `index.html`. It further serves assets provided through `publicPaths` so that local assets are loaded. Then `jsdom-screenshot` uses [`puppeteer`](https://github.com/googlechrome/puppeteer/) to take a screenshot take screenshots of that page using headless Google Chrome.
 
 ### Technically
 
-The `generateImage` function reads the whole markup of `jsdom` using `document.documentElement.outerHTML`. It then launches a [`puppeteer`](https://github.com/googlechrome/puppeteer/) instance and opens a new page. It sets the contents to the contents of `jsdom` (the read `document.documentElement.outerHTML`) and waits until all resources are loaded (the network becomes idle) before taking a screenshot.
+The `generateImage` function reads the whole markup of `jsdom` using `document.documentElement.outerHTML`.
+
+It then starts a local webserver on a random open port to serve the obtained markup as as `index.html`.
+
+Once the server is read, it launches a [`puppeteer`](https://github.com/googlechrome/puppeteer/) instance and opens that `index.html` page.
+It waits until all resources are loaded (the network becomes idle) before taking a screenshot.
+
+It then returns that screenshot.
 
 ## Performance
 

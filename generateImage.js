@@ -10,7 +10,53 @@ const addArg = (opts, arg) => {
   }
 };
 
-const takeScreenshot = async (html, opts) => {
+// starts a server and returns it
+// - server runs on random open port
+//   callers can use server.address().port to read the port
+// - server serves "html" as index.html
+// - server serves static files in all public paths
+const createServer = async (html, { publicPaths }) => {
+  const http = require("http");
+  const connect = require("connect");
+  const serveStatic = require("serve-static");
+  const finalhandler = require("finalhandler");
+
+  const app = connect();
+  app.use(
+    (request, response, next) =>
+      request.url === "/" ? response.end(html) : next()
+  );
+
+  // serve all public paths
+  publicPaths.forEach(p => app.use(serveStatic(p)));
+
+  app.use(finalhandler);
+  const server = http.createServer(app);
+
+  // Start server on a random unused port.
+  //
+  // We can't use a predeterimined port as Jest runs tests in parrallel, so
+  // multiple tests would attempt to use the same port.
+  //
+  // Inspired by https://gist.github.com/mikeal/1840641
+  await new Promise((resolve, reject) => {
+    const startServer = () => {
+      // 0 assigns a random port, but it does not guarantee that it is unsed
+      // We still need to handle that case
+      server.once("error", e => {
+        if (e.code === "EADDRINUSE") server.close(startServer);
+      });
+      // 0 assigns a random port.
+      // The port may be used, so we have to retry to find an unused port
+      server.listen(0, err => (err ? reject(err) : resolve()));
+    };
+    startServer();
+  });
+
+  return server;
+};
+
+const takeScreenshot = async (port, opts) => {
   // Options see:
   // https://github.com/GoogleChrome/puppeteer/blob/master/docs/api.md#puppeteerlaunchoptions
   const browser = await puppeteer.launch(opts.launch);
@@ -21,15 +67,19 @@ const takeScreenshot = async (html, opts) => {
     page.on("request", opts.requestInterception);
   }
 
-  // setContent won't wait for all resources to be loaded before resolving.
-  // We use page.goto in case the user wants to await them.
-  // This workaround is from:
+  // Another approach would be to use page.setContent(html) and to not start a
+  // node server at all.
+  //
+  // But then we can't wait for files to be loaded
   // https://github.com/GoogleChrome/puppeteer/issues/728#issuecomment-334301491
-  if (opts.waitForResources) {
-    await page.goto(`data:text/html,${html}`, { waitUntil: "networkidle0" });
-  } else {
-    await page.setContent(html);
-  }
+  //
+  // And we would not be able to serve local assets (the ones included through
+  // tags like <img src="/party-parrot.gif" />). We run the node server instead
+  // to serve the generated html and to serve local assets.
+  await page.goto(
+    `http://localhost:${port}`,
+    opts.waitForResources ? { waitUntil: "networkidle0" } : {}
+  );
 
   const image = await page.screenshot(opts.screenshot);
   browser.close();
@@ -40,7 +90,8 @@ const takeScreenshot = async (html, opts) => {
 const defaultOpts = {
   waitForResources: true,
   launch: {},
-  screenshot: undefined
+  screenshot: undefined,
+  publicPaths: []
 };
 
 const generateImage = async options => {
@@ -49,6 +100,10 @@ const generateImage = async options => {
   // config sugar to let users specify viewport directly
   if (options && options.viewport && !opts.launch.defaultViewport) {
     opts.launch.defaultViewport = options.viewport;
+  }
+
+  if (!Array.isArray(opts.publicPaths)) {
+    throw new Error("jsdom-screenshot: opts.publicPaths must be an array!");
   }
 
   // Disable "lcd text antialiasing" to avoid differences in the snapshots
@@ -62,9 +117,12 @@ const generateImage = async options => {
   // get HTML from JSDOM
   const html = document.documentElement.outerHTML;
 
-  // send HTML at that state to puppeteer,
-  // so that we can take a snapshot
-  return await takeScreenshot(html, opts);
+  // We start a server to enable serving local assets
+  const server = await createServer(html, opts);
+  const port = server.address().port;
+  const screenshot = await takeScreenshot(port, opts);
+  await new Promise(resolve => server.close(resolve));
+  return screenshot;
 };
 
 module.exports = generateImage;
