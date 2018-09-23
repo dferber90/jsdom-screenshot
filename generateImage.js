@@ -3,17 +3,17 @@ const merge = require("lodash.merge");
 const debug = require("./debug");
 
 const addArg = (opts, arg) => {
-  if (!Array.isArray(opts.launchOptions.args)) opts.launchOptions.args = [];
+  if (!Array.isArray(opts.launch.args)) opts.launch.args = [];
 
-  if (!opts.launchOptions.args.includes(arg)) {
-    opts.launchOptions.args.push(arg);
+  if (!opts.launch.args.includes(arg)) {
+    opts.launch.args.push(arg);
   }
 };
 
 const takeScreenshot = async (html, opts) => {
   // Options see:
   // https://github.com/GoogleChrome/puppeteer/blob/master/docs/api.md#puppeteerlaunchoptions
-  const browser = await puppeteer.launch(opts.launchOptions);
+  const browser = await puppeteer.launch(opts.launch);
   const page = await browser.newPage();
 
   if (typeof opts.requestInterception === "function") {
@@ -39,15 +39,15 @@ const takeScreenshot = async (html, opts) => {
 
 const defaultOpts = {
   waitForResources: true,
-  launchOptions: {}
+  launch: {}
 };
 
 const generateImage = async options => {
   const opts = merge({}, defaultOpts, options);
 
   // config sugar to let users specify viewport directly
-  if (options && options.viewport && !opts.launchOptions.defaultViewport) {
-    opts.launchOptions.defaultViewport = options.viewport;
+  if (options && options.viewport && !opts.launch.defaultViewport) {
+    opts.launch.defaultViewport = options.viewport;
   }
 
   // Disable "lcd text antialiasing" to avoid differences in the snapshots

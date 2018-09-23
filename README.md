@@ -13,7 +13,7 @@ This package will only give you the image, you'll have to diff it with something
 - [Install](#install)
 - [Usage](#usage)
   - [Options](#options)
-    - [`options.launchOptions`](#-optionslaunchoptions-)
+    - [`options.launch`](#-optionslaunch-)
     - [`options.debug`](#-optionsdebug-)
     - [`options.viewport`](#-optionsviewport-)
     - [`options.waitForResources`](#-optionswaitforresources-)
@@ -54,21 +54,21 @@ generateImage(component, options);
 ```js
 options = {
   // Options that are passed to Puppeteer (puppeteer.launch(options))
-  launchOptions: {},
+  launch: {},
   // Prints the jsdom markup to the console before taking the screenshot
   debug: true,
   // Wait for resources to be loaded before taking the screenshot
   waitForResources: true,
-  // Shortcut to set launchOptions.defaultViewport
+  // Shortcut to set launch.defaultViewport
   viewport: {},
   // Enables request interception
   requestInterception: () => {}
 };
 ```
 
-#### `options.launchOptions`
+#### `options.launch`
 
-`launchOptions` are passed to `puppeteer.launch([options])`, see [`docs`](https://github.com/GoogleChrome/puppeteer/blob/master/docs/api.md#puppeteerlaunchoptions).
+`launch` are passed to `puppeteer.launch([options])`, see [`docs`](https://github.com/GoogleChrome/puppeteer/blob/master/docs/api.md#puppeteerlaunch).
 
 #### `options.debug`
 
@@ -78,7 +78,7 @@ See the [Debugging JSDOM](#debugging-jsdom) section below for more information.
 
 #### `options.viewport`
 
-This is a shortcut to set `options.launchOptions.defaultViewport`. `options.launchOptions.defaultViewport` will take precedence in case both are passed.
+This is a shortcut to set `options.launch.defaultViewport`. `options.launch.defaultViewport` will take precedence in case both are passed.
 
 #### `options.waitForResources`
 
@@ -117,11 +117,11 @@ See [`page.setRequestInterception`](https://github.com/GoogleChrome/puppeteer/bl
 
 ### Changing viewport
 
-Puppeteer will use an 800x600 viewport by default. You can change the viewport by passing `launchOptions.defaultViewport`:
+Puppeteer will use an 800x600 viewport by default. You can change the viewport by passing `launch.defaultViewport`:
 
 ```js
 generateImage({
-  launchOptions: {
+  launch: {
     defaultViewport: { width: 1024, height: 768 }
   }
 });
@@ -133,9 +133,9 @@ As this is a lot of typing, there is a shortcut for it:
 generateImage({ viewport: { width: 1024, height: 768 } });
 ```
 
-`launchOptions.defaultViewport` / `viewport` also supports `deviceScaleFactor`, `isMobile`, `hasTouch` and `isLandscape`.
+`launch.defaultViewport` / `viewport` also supports `deviceScaleFactor`, `isMobile`, `hasTouch` and `isLandscape`.
 
-See [`launchOptions.defaultViewport`](https://github.com/GoogleChrome/puppeteer/blob/master/docs/api.md#puppeteerlaunchoptions).
+See [`launch.defaultViewport`](https://github.com/GoogleChrome/puppeteer/blob/master/docs/api.md#puppeteerlaunch).
 
 ## How it works
 
@@ -182,11 +182,11 @@ it("should have no visual regressions", async () => {
 
 ### Debugging `puppeteer`
 
-You can set the following `launchOptions` in case you need to debug what the page looks like before taking a screenshot:
+You can set the following `launch` in case you need to debug what the page looks like before taking a screenshot:
 
 ```js
 generateImage({
-  launchOptions: {
+  launch: {
     // Whether to auto-open a DevTools panel for each tab.
     // If this option is true, the headless option will be set false.
     devtools: true,
