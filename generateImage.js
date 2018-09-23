@@ -56,7 +56,7 @@ const createServer = async (html, { publicPaths }) => {
   return server;
 };
 
-const takeScreenshot = async (port, opts) => {
+const takeScreenshot = async (url, opts) => {
   // Options see:
   // https://github.com/GoogleChrome/puppeteer/blob/master/docs/api.md#puppeteerlaunchoptions
   const browser = await puppeteer.launch(opts.launch);
@@ -67,17 +67,8 @@ const takeScreenshot = async (port, opts) => {
     page.on("request", opts.requestInterception);
   }
 
-  // Another approach would be to use page.setContent(html) and to not start a
-  // node server at all.
-  //
-  // But then we can't wait for files to be loaded
-  // https://github.com/GoogleChrome/puppeteer/issues/728#issuecomment-334301491
-  //
-  // And we would not be able to serve local assets (the ones included through
-  // tags like <img src="/party-parrot.gif" />). We run the node server instead
-  // to serve the generated html and to serve local assets.
   await page.goto(
-    `http://localhost:${port}`,
+    url,
     opts.waitForResources ? { waitUntil: "networkidle0" } : {}
   );
 
@@ -117,10 +108,23 @@ const generateImage = async options => {
   // get HTML from JSDOM
   const html = document.documentElement.outerHTML;
 
-  // We start a server to enable serving local assets
+  // We start a server to enable serving local assets.
+  // The adds only ~0.05s so it's not worth skipping it.
+  // Using a server further enables intercepting requests with relative urls,
+  // which would not be possible when using page.goto(`data:text/html,${html}`).catch
+  //
+  // Another approach would be to use page.setContent(html) and to not start a
+  // node server at all.
+  //
+  // But then we can't wait for files to be loaded
+  // https://github.com/GoogleChrome/puppeteer/issues/728#issuecomment-334301491
+  //
+  // And we would not be able to serve local assets (the ones included through
+  // tags like <img src="/party-parrot.gif" />). We run the node server instead
+  // to serve the generated html and to serve local assets.
   const server = await createServer(html, opts);
-  const port = server.address().port;
-  const screenshot = await takeScreenshot(port, opts);
+  const url = `http://localhost:${server.address().port}`;
+  const screenshot = await takeScreenshot(url, opts);
   await new Promise(resolve => server.close(resolve));
   return screenshot;
 };
