@@ -18,7 +18,7 @@ This package will only give you the image, you'll have to diff it with something
     - [`options.publicPaths`](#-optionspublicpaths-)
     - [`options.debug`](#-optionsdebug-)
     - [`options.viewport`](#-optionsviewport-)
-    - [`options.waitForResources`](#-optionswaitforresources-)
+    - [`options.waitUntilNetworkIdle`](#-optionswaituntilnetworkidle-)
     - [`options.requestInterception`](#-optionsrequestinterception-)
   - [Changing viewport](#changing-viewport)
 - [How it works](#how-it-works)
@@ -64,7 +64,7 @@ options = {
   // Prints the jsdom markup to the console before taking the screenshot
   debug: true,
   // Wait for resources to be loaded before taking the screenshot
-  waitForResources: true,
+  waitUntilNetworkIdle: false,
   // Shortcut to set launch.defaultViewport
   viewport: {},
   // Enables request interception
@@ -96,9 +96,12 @@ See the [Debugging JSDOM](#debugging-jsdom) section below for more information.
 
 This is a shortcut to set `options.launch.defaultViewport`. `options.launch.defaultViewport` will take precedence in case both are passed.
 
-#### `options.waitForResources`
+#### `options.waitUntilNetworkIdle`
 
-When set to `true` (default), `jsdom-screenshot` will wait until the network becomes idle (all resources are loaded) before taking a screenshot.
+When set to `true`, `jsdom-screenshot` will wait until the network becomes idle (all resources are loaded) before taking a screenshot.
+You can use this to ensure that all resources are loaded before the screenshot is taken.
+
+It is disabled by default as it adds roughly one second to each screenshot. Use it wisely to avoid slowing down tests unnecessarily. You can mock requests using [`options.requestInterception`](#-optionsrequestinterception-).
 
 #### `options.requestInterception`
 

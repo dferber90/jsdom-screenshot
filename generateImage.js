@@ -69,7 +69,7 @@ const takeScreenshot = async (url, opts) => {
 
   await page.goto(
     url,
-    opts.waitForResources ? { waitUntil: "networkidle0" } : {}
+    opts.waitUntilNetworkIdle ? { waitUntil: "networkidle0" } : {}
   );
 
   const image = await page.screenshot(opts.screenshot);
@@ -79,7 +79,7 @@ const takeScreenshot = async (url, opts) => {
 };
 
 const defaultOpts = {
-  waitForResources: true,
+  waitUntilNetworkIdle: false,
   launch: {},
   screenshot: undefined,
   publicPaths: []
