@@ -15,7 +15,7 @@ const addArg = (opts, arg) => {
 //   callers can use server.address().port to read the port
 // - server serves "html" as index.html
 // - server serves static files in all public paths
-const createServer = async (html, { publicPaths }) => {
+const createServer = async (html, { serve }) => {
   const http = require("http");
   const connect = require("connect");
   const serveStatic = require("serve-static");
@@ -28,7 +28,7 @@ const createServer = async (html, { publicPaths }) => {
   );
 
   // serve all public paths
-  publicPaths.forEach(p => app.use(serveStatic(p)));
+  serve.forEach(servedFolder => app.use(serveStatic(servedFolder)));
 
   app.use(finalhandler);
   const server = http.createServer(app);
@@ -82,7 +82,7 @@ const defaultOpts = {
   waitUntilNetworkIdle: false,
   launch: {},
   screenshot: undefined,
-  publicPaths: []
+  serve: []
 };
 
 const generateImage = async options => {
@@ -93,8 +93,8 @@ const generateImage = async options => {
     opts.launch.defaultViewport = options.viewport;
   }
 
-  if (!Array.isArray(opts.publicPaths)) {
-    throw new Error("jsdom-screenshot: opts.publicPaths must be an array!");
+  if (!Array.isArray(opts.serve)) {
+    throw new Error("jsdom-screenshot: options.serve must be an array");
   }
 
   // Disable "lcd text antialiasing" to avoid differences in the snapshots
