@@ -1,0 +1,13 @@
+extends:
+  - airbnb-base
+  - prettier
+env:
+  node: true
+  # Not a real browser, but jsdom is available.
+  # This is good enough.
+  browser: true
+plugins:
+  - prettier
+rules:
+  global-require: 0
+  "prettier/prettier": "error"

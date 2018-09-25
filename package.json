@@ -3,6 +3,9 @@
   "version": "3.0.2",
   "description": "Generate screenshots of jsdom",
   "main": "index.js",
+  "scripts": {
+    "lint": "eslint ."
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/dferber90/jsdom-screenshot.git"
@@ -21,6 +24,7 @@
   },
   "dependencies": {
     "connect": "3.6.6",
+    "eslint-plugin-prettier": "2.6.2",
     "finalhandler": "1.1.1",
     "lodash.merge": "^4.6.1",
     "pretty-format": "23.6.0",
@@ -29,5 +33,12 @@
   },
   "engines": {
     "node": ">=8"
+  },
+  "devDependencies": {
+    "eslint": "5.6.0",
+    "eslint-config-airbnb-base": "13.1.0",
+    "eslint-config-prettier": "3.1.0",
+    "eslint-plugin-import": "2.14.0",
+    "prettier": "1.14.3"
   }
 }

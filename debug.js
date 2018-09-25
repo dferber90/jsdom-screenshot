@@ -6,6 +6,7 @@ const { DOMElement, DOMCollection } = prettyFormat.plugins;
 
 function prettyDOM(htmlElement, maxLength, options) {
   if (htmlElement.documentElement) {
+    // eslint-disable-next-line no-param-reassign
     htmlElement = htmlElement.documentElement;
   }
 
@@ -20,4 +21,5 @@ function prettyDOM(htmlElement, maxLength, options) {
     : debugContent;
 }
 
+// eslint-disable-next-line no-console
 module.exports = (el = document) => console.log(prettyDOM(el));

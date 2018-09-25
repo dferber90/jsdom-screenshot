@@ -3,6 +3,7 @@ const merge = require("lodash.merge");
 const debug = require("./debug");
 
 const addArg = (opts, arg) => {
+  // eslint-disable-next-line no-param-reassign
   if (!Array.isArray(opts.launch.args)) opts.launch.args = [];
 
   if (!opts.launch.args.includes(arg)) {
