@@ -74,6 +74,28 @@ it("should have no visual regressions", async () => {
 });
 ```
 
+You probably want to use a `setupTestFrameworkScriptFile` like this:
+
+```js
+// react-testing-library setup
+import "jest-dom/extend-expect";
+import "react-testing-library/cleanup-after-each";
+// set up visual regression testing
+import { toMatchImageSnapshot } from "jest-image-snapshot";
+import { setDefaultOptions } from "jsdom-screenshot";
+
+// TravisCI requires --no-sandbox to be able to run the tests
+// https://github.com/GoogleChrome/puppeteer/blob/master/docs/troubleshooting.md#running-puppeteer-on-travis-ci
+setDefaultOptions({
+  launch: { args: process.env.CI === "true" ? ["--no-sandbox"] : [] }
+});
+
+// give tests more time as taking screenshots takes a while
+jest.setTimeout(10000);
+
+expect.extend({ toMatchImageSnapshot });
+```
+
 ## API
 
 ### `generateImage(options)`
@@ -191,31 +213,20 @@ See [`launch.defaultViewport`](https://github.com/GoogleChrome/puppeteer/blob/ma
 
 Having to reapply the same options for every test is pretty inconvenient. The `setDefaultOptions` function can be used to set default options for every `generateImage` call. Any `options` passed to the `generateImage` call will get merged with the specified `defaultOptions`.
 
-This function can be used to provide global defaults.
+This function can be used to provide global defaults. Note that these defaults are global for all `generateImage` calls. You should typically only call `setDefaultOptions` once in your test-setup file.
 
-It can also be used together with `restoreDefaultOptions()` to set defaults for a specific spec.
+For example with Jest, you could do the following in your `setupTestFrameworkScriptFile` file:
 
 ```js
-import React from "react";
-import {
-  generateImage,
-  setDefaultOptions,
-  restoreDefaultOptions
-} from "jsdom-screenshot";
-import { render } from "react-testing-library";
-import { SomeCOmponent } from "<your-code>";
+import { setDefaultOptions } from "jsdom-screenshot";
 
-beforeAll(() => {
-  setDefaultOptions({ viewport: { width: 600, height: 400 } });
-});
-
-afterAll(() => {
-  restoreDefaultOptions();
-});
-
-it("has no visual regressions", async () => {
-  render(<PrimaryButton label="Submit" onClick={() => {}} />);
-  expect(await generateImage()).toMatchImageSnapshot();
+/*
+  TravisCI requires --no-sandbox to be able to run the tests.
+  We the launch options globally here so that they don't need to be
+  repeated for every `generateImage` call.
+*/
+setDefaultOptions({
+  launch: { args: process.env.CI === "true" ? ["--no-sandbox"] : [] }
 });
 ```
 
