@@ -1,15 +1,6 @@
 const puppeteer = require("puppeteer");
-const merge = require("lodash.merge");
 const debug = require("./debug");
-
-const addArg = (opts, arg) => {
-  // eslint-disable-next-line no-param-reassign
-  if (!Array.isArray(opts.launch.args)) opts.launch.args = [];
-
-  if (!opts.launch.args.includes(arg)) {
-    opts.launch.args.push(arg);
-  }
-};
+const { getMergedOptions } = require("./options");
 
 // starts a server and returns it
 // - server runs on random open port
@@ -79,29 +70,8 @@ const takeScreenshot = async (url, opts) => {
   return image;
 };
 
-const defaultOpts = {
-  waitUntilNetworkIdle: false,
-  launch: {},
-  screenshot: undefined,
-  serve: []
-};
-
 const generateImage = async options => {
-  const opts = merge({}, defaultOpts, options);
-
-  // config sugar to let users specify viewport directly
-  if (options && options.viewport && !opts.launch.defaultViewport) {
-    opts.launch.defaultViewport = options.viewport;
-  }
-
-  if (!Array.isArray(opts.serve)) {
-    throw new Error("jsdom-screenshot: options.serve must be an array");
-  }
-
-  // Disable "lcd text antialiasing" to avoid differences in the snapshots
-  // depending on the used monitor.
-  // See https://github.com/dferber90/jsdom-screenshot/issues/1
-  addArg(opts, "--disable-lcd-text");
+  const opts = getMergedOptions(options);
 
   // Allows easy debugging by passing generateImage({ debug: true })
   if (opts.debug) debug(document);

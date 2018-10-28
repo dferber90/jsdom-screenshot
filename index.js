@@ -12,5 +12,7 @@ module.exports = {
   //
   // render: require("./src/render"),
   generateImage: require("./generateImage"),
+  setDefaultOptions: require("./options").setDefaultOptions,
+  restoreDefaultOptions: require("./options").restoreDefaultOptions,
   debug: require("./debug")
 };

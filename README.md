@@ -12,18 +12,25 @@ This package will only give you the image, you'll have to diff it with something
 
 - [Install](#install)
 - [Usage](#usage)
-  - [Options](#options)
-    - [`options.launch`](#-optionslaunch-)
-    - [`options.screenshot`](#-optionsscreenshot-)
-    - [`options.serve`](#-optionsserve-)
-    - [`options.debug`](#-optionsdebug-)
-    - [`options.viewport`](#-optionsviewport-)
-    - [`options.waitUntilNetworkIdle`](#-optionswaituntilnetworkidle-)
-    - [`options.intercept`](#-optionsintercept-)
-  - [Changing viewport](#changing-viewport)
+- [Usage in Jest & React](#usage-in-jest---react)
+- [API](#api)
+  - [`generateImage(options)`](#-generateimage-options--)
+    - [Options](#options)
+      - [`options.launch`](#-optionslaunch-)
+      - [`options.screenshot`](#-optionsscreenshot-)
+      - [`options.serve`](#-optionsserve-)
+      - [`options.debug`](#-optionsdebug-)
+      - [`options.viewport`](#-optionsviewport-)
+      - [`options.waitUntilNetworkIdle`](#-optionswaituntilnetworkidle-)
+      - [`options.intercept`](#-optionsintercept-)
+    - [Changing viewport](#changing-viewport)
+  - [`setDefaultOptions(options)`](#-setdefaultoptions-options--)
+  - [`restoreDefaultOptions()`](#-restoredefaultoptions---)
+  - [`debug(element)`](#-debug-element--)
 - [How it works](#how-it-works)
   - [High level](#high-level)
   - [Technically](#technically)
+- [Performance](#performance)
 - [Debugging](#debugging)
   - [Debugging JSDOM](#debugging-jsdom)
   - [Debugging `puppeteer`](#debugging--puppeteer-)
@@ -51,7 +58,31 @@ document.body.appendChild(div);
 generateImage(component, options);
 ```
 
-### Options
+## Usage in Jest & React
+
+It is recommended to use this package with [`jest-image-snapshot`](https://www.npmjs.com/package/jest-image-snapshot) and [`react-testing-library`](https://github.com/kentcdodds/react-testing-library). Use it as together like this:
+
+```js
+import React from "react";
+import { generateImage, setDefaultOptions } from "jsdom-screenshot";
+import { render } from "react-testing-library";
+import { SomeComponent } from "<your-code>";
+
+it("should have no visual regressions", async () => {
+  render(<SomeComponent />);
+  expect(await generateImage()).toMatchImageSnapshot();
+});
+```
+
+## API
+
+### `generateImage(options)`
+
+`generateImage` is the main function you're going to use to take a screenshot of the JSDOM. It supports these options.
+
+> Tip: You can use `react-testing-library`'s `fireEvent` to get the component into any state before taking the screenshot.
+
+#### Options
 
 ```js
 options = {
@@ -72,38 +103,38 @@ options = {
 };
 ```
 
-#### `options.launch`
+##### `options.launch`
 
 `launch` options are passed to `puppeteer.launch([options])`, see [`docs`](https://github.com/GoogleChrome/puppeteer/blob/master/docs/api.md#puppeteerlaunch).
 
-#### `options.screenshot`
+##### `options.screenshot`
 
 `screenshot` options are passed to `page.screenshot([options])`, see [`docs`](https://github.com/GoogleChrome/puppeteer/blob/master/docs/api.md#pagescreenshotoptions).
 
-#### `options.serve`
+##### `options.serve`
 
 `serve` is an array of strings. You can provide a list of folders to serve statically. This is useful when your component uses assets through relative links like `<img src="/party-parrot.gif" />`.
 
 In this case, you could provide `serve: ["images"]` when the `images` folder at the root of your project (where you launch the tests from) contains `party-parrot.gif`.
 
-#### `options.debug`
+##### `options.debug`
 
 Prints the jsdom markup to the console before taking the screenshot.
 
 See the [Debugging JSDOM](#debugging-jsdom) section below for more information.
 
-#### `options.viewport`
+##### `options.viewport`
 
 This is a shortcut to set `options.launch.defaultViewport`. `options.launch.defaultViewport` will take precedence in case both are passed.
 
-#### `options.waitUntilNetworkIdle`
+##### `options.waitUntilNetworkIdle`
 
 When set to `true`, `jsdom-screenshot` will wait until the network becomes idle (all resources are loaded) before taking a screenshot.
 You can use this to ensure that all resources are loaded before the screenshot is taken.
 
 It is disabled by default as it adds roughly one second to each screenshot. Use it wisely to avoid slowing down tests unnecessarily. You can mock requests using [`options.intercept`](#-optionsintercept-).
 
-#### `options.intercept`
+##### `options.intercept`
 
 When provided, `puppeteer`'s request interception will be enabled. The provided function will be called with the intercepted request.
 
@@ -134,7 +165,7 @@ generateImage({
 
 See [`page.setintercept`](https://github.com/GoogleChrome/puppeteer/blob/master/docs/api.md#pagesetinterceptvalue) of `puppeteer`.
 
-### Changing viewport
+#### Changing viewport
 
 Puppeteer will use an 800x600 viewport by default. You can change the viewport by passing `launch.defaultViewport`:
 
@@ -155,6 +186,46 @@ generateImage({ viewport: { width: 1024, height: 768 } });
 `launch.defaultViewport` / `viewport` also supports `deviceScaleFactor`, `isMobile`, `hasTouch` and `isLandscape`.
 
 See [`launch.defaultViewport`](https://github.com/GoogleChrome/puppeteer/blob/master/docs/api.md#puppeteerlaunch).
+
+### `setDefaultOptions(options)`
+
+Having to reapply the same options for every test is pretty inconvenient. The `setDefaultOptions` function can be used to set default options for every `generateImage` call. Any `options` passed to the `generateImage` call will get merged with the specified `defaultOptions`.
+
+This function can be used to provide global defaults.
+
+It can also be used together with `restoreDefaultOptions()` to set defaults for a specific spec.
+
+```js
+import React from "react";
+import {
+  generateImage,
+  setDefaultOptions,
+  restoreDefaultOptions
+} from "jsdom-screenshot";
+import { render } from "react-testing-library";
+import { SomeCOmponent } from "<your-code>";
+
+beforeAll(() => {
+  setDefaultOptions({ viewport: { width: 600, height: 400 } });
+});
+
+afterAll(() => {
+  restoreDefaultOptions();
+});
+
+it("has no visual regressions", async () => {
+  render(<PrimaryButton label="Submit" onClick={() => {}} />);
+  expect(await generateImage()).toMatchImageSnapshot();
+});
+```
+
+### `restoreDefaultOptions()`
+
+The `restoreDefaultOptions` function restores the default options provided by `jsdom-screenshot`. See `setDefaultOptions` for a usage example.
+
+### `debug(element)`
+
+Logs the JSDOM contents to the console. See [Debugging](#debugging) for more information.
 
 ## How it works
 
