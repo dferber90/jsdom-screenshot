@@ -2,7 +2,9 @@
 
 Generate screenshots of JSDOM.
 
-Useful for visual regression testing.
+> ⚠️ **This package is useful for visual regression testing, but highly experimental.**
+>
+> **If you just want visual regression testing that works, I'd recommend using a CI service for it. Otherwise you'll run differences due to different operating systems, font-rendering, animations and even GPUs.**
 
 This package will only give you the image, you'll have to diff it with something else (like [`jest-image-snapshot`](https://www.npmjs.com/package/jest-image-snapshot)). If you are using Jest, you might be interested in [jest-transform-css](https://github.com/dferber90/jest-transform-css), which allows you to load styles into your Jest test setup.
 
