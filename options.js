@@ -30,7 +30,7 @@ module.exports.getMergedOptions = options => {
   const opts = merge({}, defaultOptions, options);
 
   // If user provided target element we mark it so we can then query its offset in puppeteer
-  if (options.target) {
+  if (options && options.target) {
     options.target.setAttribute("data-jsdom-screenshot-target", "");
   }
 

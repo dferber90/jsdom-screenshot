@@ -57,7 +57,7 @@ div.innerText = "Hello World";
 document.body.appendChild(div);
 
 // take screenshot
-generateImage(component, options);
+generateImage();
 ```
 
 ## Usage in Jest & React
@@ -86,7 +86,7 @@ import "react-testing-library/cleanup-after-each";
 import { toMatchImageSnapshot } from "jest-image-snapshot";
 import { setDefaultOptions } from "jsdom-screenshot";
 
-// TravisCI requires --no-sandbox to be able to run the tests
+// TravisCI and Linux OS require --no-sandbox to be able to run the tests
 // https://github.com/GoogleChrome/puppeteer/blob/master/docs/troubleshooting.md#running-puppeteer-on-travis-ci
 setDefaultOptions({
   launch: { args: process.env.CI === "true" ? ["--no-sandbox"] : [] }
@@ -96,6 +96,40 @@ setDefaultOptions({
 jest.setTimeout(10000);
 
 expect.extend({ toMatchImageSnapshot });
+```
+
+## Usage in jest, React & enzyme
+
+Same as before, but this time:
+ * Use enzyme to mount the React the component. Also we need to `attachTo` it to the DOM.
+ * Mount an entire application or page that contains the component we want to test instead of isolated component.
+ * Provide component's root HTML element as `target` option so the screenshot is limited only to its area.
+
+```js
+import { mount } from "enzyme";
+import { App } from "../your/code";
+describe("header", ()=>{
+  let wrapper;
+  beforeEach(()=>{
+    wrapper = mount( <App history={history}/>, { attachTo: document.body });
+  })
+  afterEach(()=>{
+    wrapper.detach();
+  })
+  it("Should remark correct navigation link when url is /", async () => {
+    navigate("/notFound");
+    expect(text(wrapper.update().find("Header .navbar .active"))).not.toBe("home");
+    navigate("/");
+    expect(text(wrapper.update().find("Header .navbar .active"))).toBe("home");
+    expect(await generateImage({target: findOne(wrapper.find("Header .navbar"))})).toMatchImageSnapshot()
+  });
+  it("Should remark correct navigation link when url is /countryIndicator/{}", async () => {
+    expect(text(wrapper.find("Header .navbar .active"))).not.toBe("country indicators");
+    navigate("/countryIndicator/{}");
+    expect(text(wrapper.update().find("Header .navbar .active"))).toBe("country indicators");
+    expect(await generateImage({target: findOne(wrapper.find("Header .navbar"))})).toMatchImageSnapshot()
+  });
+})
 ```
 
 ## API
@@ -160,7 +194,7 @@ It is disabled by default as it adds roughly one second to each screenshot. Use 
 
 ##### `options.target`
 
-A HTMLElement can be provided to take the screenshot only of it.  
+A HTMLElement can be provided to take a screenshot only of it. This will set `options.screenshot.clip` to match given element's offset properties (`offsetLeft`, `offsetTop`, `offsetWidth` and `offsetHeight`). 
 
 ##### `options.intercept`
 
