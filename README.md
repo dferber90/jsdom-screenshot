@@ -158,6 +158,10 @@ You can use this to ensure that all resources are loaded before the screenshot i
 
 It is disabled by default as it adds roughly one second to each screenshot. Use it wisely to avoid slowing down tests unnecessarily. You can mock requests using [`options.intercept`](#-optionsintercept-).
 
+##### `options.target`
+
+A HTMLElement can be provided to take the screenshot only of it.  
+
 ##### `options.intercept`
 
 When provided, `puppeteer`'s request interception will be enabled. The provided function will be called with the intercepted request.
