@@ -98,6 +98,20 @@ jest.setTimeout(10000);
 expect.extend({ toMatchImageSnapshot });
 ```
 
+## Usage in TypeScript
+
+In TypeScript, you can declare the custom jest matcher `toMatchImageSnapshot` like this: 
+
+```
+declare global {
+  namespace jest {
+    interface Matchers<R> {
+      toMatchImageSnapshot(): R
+    }
+  }
+}
+```
+
 ## API
 
 ### `generateImage(options)`
