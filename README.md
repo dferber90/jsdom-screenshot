@@ -15,6 +15,7 @@ This package will only give you the image, you'll have to diff it with something
 - [Install](#install)
 - [Usage](#usage)
 - [Usage in Jest & React](#usage-in-jest---react)
+- [Usage in jest, React & enzyme](#usage-in-jest-react--enzyme)
 - [API](#api)
   - [`generateImage(options)`](#-generateimage-options--)
     - [Options](#options)
@@ -60,7 +61,7 @@ document.body.appendChild(div);
 generateImage();
 ```
 
-## Usage in Jest & React
+## Usage in Jest, React & react-testing-library
 
 It is recommended to use this package with [`jest-image-snapshot`](https://www.npmjs.com/package/jest-image-snapshot) and [`react-testing-library`](https://github.com/kentcdodds/react-testing-library). Use it as together like this:
 
@@ -101,6 +102,7 @@ expect.extend({ toMatchImageSnapshot });
 ## Usage in jest, React & enzyme
 
 Same as before, but this time:
+
  * Use enzyme to mount the React the component. Also we need to `attachTo` it to the DOM.
  * Mount an entire application or page that contains the component we want to test instead of isolated component.
  * Provide component's root HTML element as `target` option so the screenshot is limited only to its area.
@@ -108,28 +110,27 @@ Same as before, but this time:
 ```js
 import { mount } from "enzyme";
 import { App } from "../your/code";
-describe("header", ()=>{
+describe("header", () => {
   let wrapper;
-  beforeEach(()=>{
-    wrapper = mount( <App history={history}/>, { attachTo: document.body });
-  })
-  afterEach(()=>{
+  beforeEach(() => {
+    wrapper = mount(<App history={history} />, { attachTo: document.body });
+  });
+  afterEach(() => {
     wrapper.detach();
-  })
+  });
   it("Should remark correct navigation link when url is /", async () => {
     navigate("/notFound");
-    expect(text(wrapper.update().find("Header .navbar .active"))).not.toBe("home");
+    expect(text(wrapper.update().find("Header .navbar .active"))).not.toBe(
+      "home"
+    );
     navigate("/");
     expect(text(wrapper.update().find("Header .navbar .active"))).toBe("home");
-    expect(await generateImage({target: findOne(wrapper.find("Header .navbar"))})).toMatchImageSnapshot()
+    expect(
+      await generateImage({ target: findOne(wrapper.find("Header .navbar")) })
+    ).toMatchImageSnapshot();
   });
-  it("Should remark correct navigation link when url is /countryIndicator/{}", async () => {
-    expect(text(wrapper.find("Header .navbar .active"))).not.toBe("country indicators");
-    navigate("/countryIndicator/{}");
-    expect(text(wrapper.update().find("Header .navbar .active"))).toBe("country indicators");
-    expect(await generateImage({target: findOne(wrapper.find("Header .navbar"))})).toMatchImageSnapshot()
-  });
-})
+});
+
 ```
 
 ## API
