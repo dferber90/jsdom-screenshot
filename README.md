@@ -14,7 +14,7 @@ This package will only give you the image, you'll have to diff it with something
 
 - [Install](#install)
 - [Usage](#usage)
-- [Usage in Jest & React](#usage-in-jest---react)
+- [Usage in Jest, React & react-testing-library](#usage-in-jest-react--react-testing-library)
 - [Usage in jest, React & enzyme](#usage-in-jest-react--enzyme)
 - [API](#api)
   - [`generateImage(options)`](#-generateimage-options--)
