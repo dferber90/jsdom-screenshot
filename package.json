@@ -4,7 +4,8 @@
   "description": "Generate screenshots of jsdom",
   "main": "index.js",
   "scripts": {
-    "lint": "eslint ."
+    "lint": "eslint .",
+    "test": "node tests/smoke.js"
   },
   "repository": {
     "type": "git",
@@ -23,22 +24,23 @@
     "url": "https://github.com/dferber90/jsdom-screenshot/issues"
   },
   "dependencies": {
-    "connect": "3.6.6",
-    "eslint-plugin-prettier": "3.0.1",
-    "finalhandler": "1.1.1",
+    "connect": "3.7.0",
+    "eslint-plugin-prettier": "3.1.0",
+    "finalhandler": "1.1.2",
     "lodash.merge": "^4.6.1",
-    "pretty-format": "24.0.0",
+    "pretty-format": "24.8.0",
     "puppeteer": "^1.12.2",
-    "serve-static": "1.13.2"
+    "serve-static": "1.14.1"
   },
   "engines": {
     "node": ">=8"
   },
   "devDependencies": {
-    "eslint": "5.14.1",
+    "eslint": "5.16.0",
     "eslint-config-airbnb-base": "13.1.0",
-    "eslint-config-prettier": "4.0.0",
-    "eslint-plugin-import": "2.16.0",
-    "prettier": "1.16.4"
+    "eslint-config-prettier": "4.3.0",
+    "eslint-plugin-import": "2.17.2",
+    "jsdom": "15.1.0",
+    "prettier": "1.17.1"
   }
 }
