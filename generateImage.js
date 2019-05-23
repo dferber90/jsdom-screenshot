@@ -65,7 +65,7 @@ const takeScreenshot = async (url, opts) => {
   );
 
   // If user provided options.target then we try to query previously marked element offset to clip the screenshot
-  const clip = await page.evaluate( (targetSelector) => {
+  const clip = await page.evaluate(targetSelector => {
     if (targetSelector) {
       const target = document.querySelector(targetSelector);
       if (target) {
@@ -78,7 +78,8 @@ const takeScreenshot = async (url, opts) => {
       }
     }
   }, opts.targetSelector);
-  if(clip) {
+
+  if (clip) {
     opts.screenshot = opts.screenshot || {};
     opts.screenshot.clip = clip;
   }

@@ -23,6 +23,7 @@ This package will only give you the image, you'll have to diff it with something
       - [`options.serve`](#-optionsserve-)
       - [`options.debug`](#-optionsdebug-)
       - [`options.viewport`](#-optionsviewport-)
+      - [`options.targetSelector`](#-optionstargetselector-)
       - [`options.waitUntilNetworkIdle`](#-optionswaituntilnetworkidle-)
       - [`options.intercept`](#-optionsintercept-)
     - [Changing viewport](#changing-viewport)
@@ -48,7 +49,7 @@ npm install jsdom-screenshot --save-dev
 
 You must be in a [jsdom](https://github.com/jsdom/jsdom) environment.
 
-```js
+```jsx
 import { generateImage } from "jsdom-screenshot";
 
 // add some content to jsdom (this could also be React or any other library!)
@@ -64,7 +65,7 @@ generateImage();
 
 It is recommended to use this package with [`jest-image-snapshot`](https://www.npmjs.com/package/jest-image-snapshot) and [`react-testing-library`](https://github.com/kentcdodds/react-testing-library). Use it as together like this:
 
-```js
+```jsx
 import React from "react";
 import { generateImage, setDefaultOptions } from "jsdom-screenshot";
 import { render } from "react-testing-library";
@@ -76,31 +77,9 @@ it("should have no visual regressions", async () => {
 });
 ```
 
-If you want to only target element, you can do:
-```js
-import React from "react";
-import { generateImage, setDefaultOptions } from "jsdom-screenshot";
-import { render } from "react-testing-library";
-import { SomeComponent } from "<your-code>";
-
-it("should have no visual regressions", async () => {
-  // display: "table" prevents div from using full width
-  render(
-    <div data-testid="root" style={{ display: "table" }}>
-      <SomeComponent />
-    </div>
-  );
-
-  const image = await generateImage({
-    targetSelector: "[data-testid=root]"
-  });
-  expect(image).toMatchImageSnapshot();
-});
-```
-
 You probably want to use a `setupTestFrameworkScriptFile` like this:
 
-```js
+```jsx
 // react-testing-library setup
 import "jest-dom/extend-expect";
 import "react-testing-library/cleanup-after-each";
@@ -130,7 +109,7 @@ expect.extend({ toMatchImageSnapshot });
 
 #### Options
 
-```js
+```jsx
 options = {
   // Options used to launch Puppeteer (puppeteer.launch(options))
   launch: {},
@@ -173,16 +152,40 @@ See the [Debugging JSDOM](#debugging-jsdom) section below for more information.
 
 This is a shortcut to set `options.launch.defaultViewport`. `options.launch.defaultViewport` will take precedence in case both are passed.
 
+##### `options.targetSelector`
+
+A CSS selector can be provided to take a screenshot only of an element found by given selector. This will set `puppeteer`s `options.screenshot.clip` to match the given element's offset properties (`offsetLeft`, `offsetTop`, `offsetWidth` and `offsetHeight`).
+
+Example:
+
+```jsx
+import React from "react";
+import { generateImage, setDefaultOptions } from "jsdom-screenshot";
+import { render } from "react-testing-library";
+import { SomeComponent } from "<your-code>";
+
+it("should have no visual regressions", async () => {
+  // display: "table" prevents div from using full width,
+  // so the screenshot would not cover the full width here
+  render(
+    <div data-testid="root" style={{ display: "table" }}>
+      <SomeComponent />
+    </div>
+  );
+
+  const image = await generateImage({
+    targetSelector: "[data-testid=root]"
+  });
+  expect(image).toMatchImageSnapshot();
+});
+```
+
 ##### `options.waitUntilNetworkIdle`
 
 When set to `true`, `jsdom-screenshot` will wait until the network becomes idle (all resources are loaded) before taking a screenshot.
 You can use this to ensure that all resources are loaded before the screenshot is taken.
 
 It is disabled by default as it adds roughly one second to each screenshot. Use it wisely to avoid slowing down tests unnecessarily. You can mock requests using [`options.intercept`](#-optionsintercept-).
-
-##### `options.targetSelector`
-
-A CSS selector can be provided to take a screenshot only of element found by given selector. This will set `options.screenshot.clip` to match given element's offset properties (`offsetLeft`, `offsetTop`, `offsetWidth` and `offsetHeight`). 
 
 ##### `options.intercept`
 
@@ -192,7 +195,7 @@ Activating request interception enables [`request.abort`](https://github.com/Goo
 
 This can be used to speed up tests by stubbing requests.
 
-```js
+```jsx
 generateImage({
   intercept: request => {
     if (request.url().endsWith(".png") || request.url().endsWith(".jpg")) {
@@ -219,7 +222,7 @@ See [`page.setintercept`](https://github.com/GoogleChrome/puppeteer/blob/master/
 
 Puppeteer will use an 800x600 viewport by default. You can change the viewport by passing `launch.defaultViewport`:
 
-```js
+```jsx
 generateImage({
   launch: {
     defaultViewport: { width: 1024, height: 768 }
@@ -229,7 +232,7 @@ generateImage({
 
 As this is a lot of typing, there is a shortcut for it:
 
-```js
+```jsx
 generateImage({ viewport: { width: 1024, height: 768 } });
 ```
 
@@ -245,7 +248,7 @@ This function can be used to provide global defaults. Note that these defaults a
 
 For example with Jest, you could do the following in your `setupTestFrameworkScriptFile` file:
 
-```js
+```jsx
 import { setDefaultOptions } from "jsdom-screenshot";
 
 /*
@@ -296,13 +299,13 @@ good Visual Regression Tests will make up for the lost time in tests. Find a goo
 
 You can print the markup of `jsdom` which gets passed to `puppeteer` to take the screenshot by passing `debug: true`:
 
-```js
+```jsx
 generateImage({ debug: true });
 ```
 
 You can also import the `debug` function and call it manually at any point. It will log the markup of `jsdom` to the console:
 
-```js
+```jsx
 import { generateImage, debug } from "jsdom-screenshot";
 
 it("should have no visual regressions", async () => {
@@ -320,7 +323,7 @@ it("should have no visual regressions", async () => {
 
 You can set the following `launch` in case you need to debug what the page looks like before taking a screenshot:
 
-```js
+```jsx
 generateImage({
   launch: {
     // Whether to auto-open a DevTools panel for each tab.
