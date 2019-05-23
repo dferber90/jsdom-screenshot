@@ -1,4 +1,5 @@
 const puppeteer = require("puppeteer");
+const merge = require("lodash.merge");
 const debug = require("./debug");
 const { getMergedOptions } = require("./options");
 
@@ -49,6 +50,10 @@ const createServer = async (html, { serve }) => {
 };
 
 const takeScreenshot = async (url, opts) => {
+  // opts.screenshot may contain options which should get forwarded to
+  // puppeteer's page.screenshot as they are
+  const screenshotOptions = merge({}, opts.screenshot);
+
   // Options see:
   // https://github.com/GoogleChrome/puppeteer/blob/master/docs/api.md#puppeteerlaunchoptions
   const browser = await puppeteer.launch(opts.launch);
@@ -64,27 +69,31 @@ const takeScreenshot = async (url, opts) => {
     opts.waitUntilNetworkIdle ? { waitUntil: "networkidle0" } : {}
   );
 
-  // If user provided options.target then we try to query previously marked element offset to clip the screenshot
-  const clip = await page.evaluate(targetSelector => {
-    if (targetSelector) {
-      const target = document.querySelector(targetSelector);
-      if (target) {
-        return {
-          x: target.offsetLeft,
-          y: target.offsetTop,
-          width: target.offsetWidth,
-          height: target.offsetHeight
-        };
-      }
-    }
-  }, opts.targetSelector);
-
-  if (clip) {
-    opts.screenshot = opts.screenshot || {};
-    opts.screenshot.clip = clip;
+  // If user provided options.targetSelector we try to find that element and
+  // use its bounding box to clip the screenshot.
+  // When no element is found we fall back to opts.screenshot.clip in case it
+  // was specified already
+  if (opts.targetSelector) {
+    screenshotOptions.clip = await page.evaluate(
+      (targetSelector, fallbackClip) => {
+        const target = document.querySelector(targetSelector);
+        return target
+          ? {
+              x: target.offsetLeft,
+              y: target.offsetTop,
+              width: target.offsetWidth,
+              height: target.offsetHeight
+            }
+          : // fall back to manual clipping values in case the element could
+            // not be found
+            fallbackClip;
+      },
+      opts.targetSelector,
+      screenshotOptions.clip
+    );
   }
 
-  const image = await page.screenshot(opts.screenshot);
+  const image = await page.screenshot(screenshotOptions);
   browser.close();
 
   return image;
