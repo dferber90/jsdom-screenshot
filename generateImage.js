@@ -64,6 +64,25 @@ const takeScreenshot = async (url, opts) => {
     opts.waitUntilNetworkIdle ? { waitUntil: "networkidle0" } : {}
   );
 
+  // If user provided options.target then we try to query previously marked element offset to clip the screenshot
+  const clip = await page.evaluate( (targetSelector) => {
+    if (targetSelector) {
+      const target = document.querySelector(targetSelector);
+      if (target) {
+        return {
+          x: target.offsetLeft,
+          y: target.offsetTop,
+          width: target.offsetWidth,
+          height: target.offsetHeight
+        };
+      }
+    }
+  }, opts.targetSelector);
+  if(clip) {
+    opts.screenshot = opts.screenshot || {};
+    opts.screenshot.clip = clip;
+  }
+
   const image = await page.screenshot(opts.screenshot);
   browser.close();
 

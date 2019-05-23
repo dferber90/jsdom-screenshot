@@ -14,7 +14,7 @@ This package will only give you the image, you'll have to diff it with something
 
 - [Install](#install)
 - [Usage](#usage)
-- [Usage in Jest & React](#usage-in-jest---react)
+- [Usage in Jest, React & react-testing-library](#usage-in-jest-react--react-testing-library)
 - [API](#api)
   - [`generateImage(options)`](#-generateimage-options--)
     - [Options](#options)
@@ -57,10 +57,10 @@ div.innerText = "Hello World";
 document.body.appendChild(div);
 
 // take screenshot
-generateImage(component, options);
+generateImage();
 ```
 
-## Usage in Jest & React
+## Usage in Jest, React & react-testing-library
 
 It is recommended to use this package with [`jest-image-snapshot`](https://www.npmjs.com/package/jest-image-snapshot) and [`react-testing-library`](https://github.com/kentcdodds/react-testing-library). Use it as together like this:
 
@@ -76,6 +76,28 @@ it("should have no visual regressions", async () => {
 });
 ```
 
+If you want to only target element, you can do:
+```js
+import React from "react";
+import { generateImage, setDefaultOptions } from "jsdom-screenshot";
+import { render } from "react-testing-library";
+import { SomeComponent } from "<your-code>";
+
+it("should have no visual regressions", async () => {
+  // display: "table" prevents div from using full width
+  render(
+    <div data-testid="root" style={{ display: "table" }}>
+      <SomeComponent />
+    </div>
+  );
+
+  const image = await generateImage({
+    targetSelector: "[data-testid=root]"
+  });
+  expect(image).toMatchImageSnapshot();
+});
+```
+
 You probably want to use a `setupTestFrameworkScriptFile` like this:
 
 ```js
@@ -86,7 +108,7 @@ import "react-testing-library/cleanup-after-each";
 import { toMatchImageSnapshot } from "jest-image-snapshot";
 import { setDefaultOptions } from "jsdom-screenshot";
 
-// TravisCI requires --no-sandbox to be able to run the tests
+// TravisCI and Linux OS require --no-sandbox to be able to run the tests
 // https://github.com/GoogleChrome/puppeteer/blob/master/docs/troubleshooting.md#running-puppeteer-on-travis-ci
 setDefaultOptions({
   launch: { args: process.env.CI === "true" ? ["--no-sandbox"] : [] }
@@ -157,6 +179,10 @@ When set to `true`, `jsdom-screenshot` will wait until the network becomes idle 
 You can use this to ensure that all resources are loaded before the screenshot is taken.
 
 It is disabled by default as it adds roughly one second to each screenshot. Use it wisely to avoid slowing down tests unnecessarily. You can mock requests using [`options.intercept`](#-optionsintercept-).
+
+##### `options.targetSelector`
+
+A CSS selector can be provided to take a screenshot only of element found by given selector. This will set `options.screenshot.clip` to match given element's offset properties (`offsetLeft`, `offsetTop`, `offsetWidth` and `offsetHeight`). 
 
 ##### `options.intercept`
 

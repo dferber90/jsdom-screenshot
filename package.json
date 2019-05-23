@@ -24,21 +24,21 @@
   },
   "dependencies": {
     "connect": "3.6.6",
-    "eslint-plugin-prettier": "2.6.2",
+    "eslint-plugin-prettier": "3.0.1",
     "finalhandler": "1.1.1",
     "lodash.merge": "^4.6.1",
-    "pretty-format": "23.6.0",
-    "puppeteer": "^1.4.0",
+    "pretty-format": "24.0.0",
+    "puppeteer": "^1.12.2",
     "serve-static": "1.13.2"
   },
   "engines": {
     "node": ">=8"
   },
   "devDependencies": {
-    "eslint": "5.6.0",
+    "eslint": "5.14.1",
     "eslint-config-airbnb-base": "13.1.0",
-    "eslint-config-prettier": "3.1.0",
-    "eslint-plugin-import": "2.14.0",
-    "prettier": "1.14.3"
+    "eslint-config-prettier": "4.0.0",
+    "eslint-plugin-import": "2.16.0",
+    "prettier": "1.16.4"
   }
 }
