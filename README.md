@@ -15,7 +15,6 @@ This package will only give you the image, you'll have to diff it with something
 - [Install](#install)
 - [Usage](#usage)
 - [Usage in Jest, React & react-testing-library](#usage-in-jest-react--react-testing-library)
-- [Usage in jest, React & enzyme](#usage-in-jest-react--enzyme)
 - [API](#api)
   - [`generateImage(options)`](#-generateimage-options--)
     - [Options](#options)
@@ -77,6 +76,28 @@ it("should have no visual regressions", async () => {
 });
 ```
 
+If you want to only target element, you can do:
+```js
+import React from "react";
+import { generateImage, setDefaultOptions } from "jsdom-screenshot";
+import { render } from "react-testing-library";
+import { SomeComponent } from "<your-code>";
+
+it("should have no visual regressions", async () => {
+  // display: "table" prevents div from using full width
+  render(
+    <div data-testid="root" style={{ display: "table" }}>
+      <SomeComponent />
+    </div>
+  );
+
+  const image = await generateImage({
+    targetSelector: "[data-testid=root]"
+  });
+  expect(image).toMatchImageSnapshot();
+});
+```
+
 You probably want to use a `setupTestFrameworkScriptFile` like this:
 
 ```js
@@ -97,40 +118,6 @@ setDefaultOptions({
 jest.setTimeout(10000);
 
 expect.extend({ toMatchImageSnapshot });
-```
-
-## Usage in jest, React & enzyme
-
-Same as before, but this time:
-
- * Use enzyme to mount the React the component. Also we need to `attachTo` it to the DOM.
- * Mount an entire application or page that contains the component we want to test instead of isolated component.
- * Provide component's root HTML element as `target` option so the screenshot is limited only to its area.
-
-```js
-import { mount } from "enzyme";
-import { App } from "../your/code";
-describe("header", () => {
-  let wrapper;
-  beforeEach(() => {
-    wrapper = mount(<App history={history} />, { attachTo: document.body });
-  });
-  afterEach(() => {
-    wrapper.detach();
-  });
-  it("Should remark correct navigation link when url is /", async () => {
-    navigate("/notFound");
-    expect(text(wrapper.update().find("Header .navbar .active"))).not.toBe(
-      "home"
-    );
-    navigate("/");
-    expect(text(wrapper.update().find("Header .navbar .active"))).toBe("home");
-    expect(
-      await generateImage({ target: findOne(wrapper.find("Header .navbar")) })
-    ).toMatchImageSnapshot();
-  });
-});
-
 ```
 
 ## API
@@ -193,9 +180,9 @@ You can use this to ensure that all resources are loaded before the screenshot i
 
 It is disabled by default as it adds roughly one second to each screenshot. Use it wisely to avoid slowing down tests unnecessarily. You can mock requests using [`options.intercept`](#-optionsintercept-).
 
-##### `options.target`
+##### `options.targetSelector`
 
-A HTMLElement can be provided to take a screenshot only of it. This will set `options.screenshot.clip` to match given element's offset properties (`offsetLeft`, `offsetTop`, `offsetWidth` and `offsetHeight`). 
+A CSS selector can be provided to take a screenshot only of element found by given selector. This will set `options.screenshot.clip` to match given element's offset properties (`offsetLeft`, `offsetTop`, `offsetWidth` and `offsetHeight`). 
 
 ##### `options.intercept`
 

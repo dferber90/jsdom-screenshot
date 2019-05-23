@@ -29,11 +29,6 @@ module.exports.restoreDefaultOptions = () => {
 module.exports.getMergedOptions = options => {
   const opts = merge({}, defaultOptions, options);
 
-  // If user provided target element we mark it so we can then query its offset in puppeteer
-  if (options && options.target) {
-    options.target.setAttribute("data-jsdom-screenshot-target", "");
-  }
-
   // config sugar to let users specify viewport directly
   if (options && options.viewport && !opts.launch.defaultViewport) {
     opts.launch.defaultViewport = options.viewport;
