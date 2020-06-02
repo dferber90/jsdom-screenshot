@@ -50,11 +50,11 @@ npm install jsdom-screenshot --save-dev
 You must be in a [jsdom](https://github.com/jsdom/jsdom) environment.
 
 ```jsx
-import { generateImage } from "jsdom-screenshot";
+import { generateImage } from 'jsdom-screenshot';
 
 // add some content to jsdom (this could also be React or any other library!)
-const div = document.createElement("div");
-div.innerText = "Hello World";
+const div = document.createElement('div');
+div.innerText = 'Hello World';
 document.body.appendChild(div);
 
 // take screenshot
@@ -66,12 +66,12 @@ generateImage();
 It is recommended to use this package with [`jest-image-snapshot`](https://www.npmjs.com/package/jest-image-snapshot) and [`react-testing-library`](https://github.com/kentcdodds/react-testing-library). Use it as together like this:
 
 ```jsx
-import React from "react";
-import { generateImage, setDefaultOptions } from "jsdom-screenshot";
-import { render } from "react-testing-library";
-import { SomeComponent } from "<your-code>";
+import React from 'react';
+import { generateImage, setDefaultOptions } from 'jsdom-screenshot';
+import { render } from 'react-testing-library';
+import { SomeComponent } from '<your-code>';
 
-it("should have no visual regressions", async () => {
+it('should have no visual regressions', async () => {
   render(<SomeComponent />);
   expect(await generateImage()).toMatchImageSnapshot();
 });
@@ -81,16 +81,16 @@ You probably want to use a `setupTestFrameworkScriptFile` like this:
 
 ```jsx
 // react-testing-library setup
-import "jest-dom/extend-expect";
-import "react-testing-library/cleanup-after-each";
+import 'jest-dom/extend-expect';
+import 'react-testing-library/cleanup-after-each';
 // set up visual regression testing
-import { toMatchImageSnapshot } from "jest-image-snapshot";
-import { setDefaultOptions } from "jsdom-screenshot";
+import { toMatchImageSnapshot } from 'jest-image-snapshot';
+import { setDefaultOptions } from 'jsdom-screenshot';
 
 // TravisCI and Linux OS require --no-sandbox to be able to run the tests
 // https://github.com/GoogleChrome/puppeteer/blob/master/docs/troubleshooting.md#running-puppeteer-on-travis-ci
 setDefaultOptions({
-  launch: { args: process.env.CI === "true" ? ["--no-sandbox"] : [] }
+  launch: { args: process.env.CI === 'true' ? ['--no-sandbox'] : [] },
 });
 
 // give tests more time as taking screenshots takes a while
@@ -116,7 +116,7 @@ options = {
   // Options used to take a screenshot (puppeteer.screenshot(options))
   screenshot: {},
   // An array of folders containing static files to be served
-  serve: ["pubilc", "assets"],
+  serve: ['pubilc', 'assets'],
   // Prints the jsdom markup to the console before taking the screenshot
   debug: true,
   // Wait for resources to be loaded before taking the screenshot
@@ -124,7 +124,7 @@ options = {
   // Shortcut to set launch.defaultViewport
   viewport: {},
   // Enables request interception
-  intercept: () => {}
+  intercept: () => {},
 };
 ```
 
@@ -159,22 +159,22 @@ A CSS selector can be provided to take a screenshot only of an element found by 
 Example:
 
 ```jsx
-import React from "react";
-import { generateImage, setDefaultOptions } from "jsdom-screenshot";
-import { render } from "react-testing-library";
-import { SomeComponent } from "<your-code>";
+import React from 'react';
+import { generateImage, setDefaultOptions } from 'jsdom-screenshot';
+import { render } from 'react-testing-library';
+import { SomeComponent } from '<your-code>';
 
-it("should have no visual regressions", async () => {
+it('should have no visual regressions', async () => {
   // display: "table" prevents div from using full width,
   // so the screenshot would not cover the full width here
   render(
-    <div data-testid="root" style={{ display: "table" }}>
+    <div data-testid="root" style={{ display: 'table' }}>
       <SomeComponent />
     </div>
   );
 
   const image = await generateImage({
-    targetSelector: "[data-testid=root]"
+    targetSelector: '[data-testid=root]',
   });
   expect(image).toMatchImageSnapshot();
 });
@@ -198,21 +198,21 @@ This can be used to speed up tests by stubbing requests.
 ```jsx
 generateImage({
   intercept: request => {
-    if (request.url().endsWith(".png") || request.url().endsWith(".jpg")) {
+    if (request.url().endsWith('.png') || request.url().endsWith('.jpg')) {
       // Blocks some images.
       request.abort();
-    } else if (request.url().endsWith("/some-big-library.css")) {
+    } else if (request.url().endsWith('/some-big-library.css')) {
       // Fake a response
       request.respond({
         status: 200,
-        contentType: "text/css",
-        body: "html, body { background: red }"
+        contentType: 'text/css',
+        body: 'html, body { background: red }',
       });
     } else {
       // Call request.continue() for requests which should not be intercepted
       request.continue();
     }
-  }
+  },
 });
 ```
 
@@ -225,8 +225,8 @@ Puppeteer will use an 800x600 viewport by default. You can change the viewport b
 ```jsx
 generateImage({
   launch: {
-    defaultViewport: { width: 1024, height: 768 }
-  }
+    defaultViewport: { width: 1024, height: 768 },
+  },
 });
 ```
 
@@ -249,7 +249,7 @@ This function can be used to provide global defaults. Note that these defaults a
 For example with Jest, you could do the following in your `setupTestFrameworkScriptFile` file:
 
 ```jsx
-import { setDefaultOptions } from "jsdom-screenshot";
+import { setDefaultOptions } from 'jsdom-screenshot';
 
 /*
   TravisCI requires --no-sandbox to be able to run the tests.
@@ -257,7 +257,7 @@ import { setDefaultOptions } from "jsdom-screenshot";
   repeated for every `generateImage` call.
 */
 setDefaultOptions({
-  launch: { args: process.env.CI === "true" ? ["--no-sandbox"] : [] }
+  launch: { args: process.env.CI === 'true' ? ['--no-sandbox'] : [] },
 });
 ```
 
@@ -306,11 +306,11 @@ generateImage({ debug: true });
 You can also import the `debug` function and call it manually at any point. It will log the markup of `jsdom` to the console:
 
 ```jsx
-import { generateImage, debug } from "jsdom-screenshot";
+import { generateImage, debug } from 'jsdom-screenshot';
 
-it("should have no visual regressions", async () => {
-  const div = document.createElement("div");
-  div.innerText = "Hello World";
+it('should have no visual regressions', async () => {
+  const div = document.createElement('div');
+  div.innerText = 'Hello World';
   document.body.appendChild(div);
 
   debug(); // <---- prints the jsdom markup to the console
@@ -334,8 +334,8 @@ generateImage({
     headless: false,
     // Slows down Puppeteer operations by the specified amount of milliseconds.
     // Useful so that you can see what is going on.
-    slowMo: 500
-  }
+    slowMo: 500,
+  },
 });
 ```
 

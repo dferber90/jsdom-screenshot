@@ -1,6 +1,11 @@
+parser: '@typescript-eslint/parser'
 extends:
-  - airbnb-base
   - prettier
+ignorePatterns:
+  - dist
+  - node_modules
+parserOptions:
+  sourceType: module
 env:
   node: true
   # Not a real browser, but jsdom is available.
@@ -8,6 +13,7 @@ env:
   browser: true
 plugins:
   - prettier
+  - '@typescript-eslint'
 rules:
   global-require: 0
-  "prettier/prettier": "error"
+  'prettier/prettier': 'error'

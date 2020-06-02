@@ -2,11 +2,17 @@
   "name": "jsdom-screenshot",
   "version": "3.2.0",
   "description": "Generate screenshots of jsdom",
-  "main": "index.js",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "scripts": {
-    "lint": "eslint .",
-    "test": "node tests/smoke.js"
+    "lint": "eslint . --ext .ts",
+    "test": "ts-node tests/smoke.ts",
+    "build": "rm -rf dist && babel -d dist -x .ts src && tsc --build tsconfig.build.json",
+    "prepublishOnly": "yarn build"
   },
+  "files": [
+    "dist/**/*"
+  ],
   "repository": {
     "type": "git",
     "url": "git+https://github.com/dferber90/jsdom-screenshot.git"
@@ -24,23 +30,44 @@
     "url": "https://github.com/dferber90/jsdom-screenshot/issues"
   },
   "dependencies": {
-    "connect": "3.7.0",
-    "eslint-plugin-prettier": "3.1.0",
-    "finalhandler": "1.1.2",
+    "express": "^4.17.1",
+    "get-port": "^5.1.1",
     "lodash.merge": "^4.6.1",
-    "pretty-format": "24.8.0",
-    "puppeteer": "^1.12.2",
-    "serve-static": "1.14.1"
+    "pretty-format": "^26.0.1",
+    "puppeteer": "^3.3.0",
+    "serve-static": "^1.14.1"
   },
   "engines": {
     "node": ">=8"
   },
   "devDependencies": {
-    "eslint": "5.16.0",
-    "eslint-config-airbnb-base": "13.1.0",
-    "eslint-config-prettier": "4.3.0",
-    "eslint-plugin-import": "2.17.2",
-    "jsdom": "15.1.0",
-    "prettier": "1.17.1"
-  }
+    "@babel/cli": "^7.10.1",
+    "@babel/core": "^7.10.2",
+    "@babel/preset-env": "^7.10.2",
+    "@babel/preset-typescript": "^7.10.1",
+    "@types/connect": "^3.4.33",
+    "@types/express": "^4.17.6",
+    "@types/finalhandler": "^1.1.0",
+    "@types/jsdom": "^16.2.3",
+    "@types/lodash.merge": "^4.6.6",
+    "@types/node": "^14.0.9",
+    "@types/puppeteer": "^3.0.0",
+    "@types/serve-static": "^1.13.4",
+    "@typescript-eslint/eslint-plugin": "^3.1.0",
+    "@typescript-eslint/parser": "^3.1.0",
+    "babel-jest": "^26.0.1",
+    "eslint": "^6.8.0",
+    "eslint-config-prettier": "^6.11.0",
+    "eslint-plugin-prettier": "^3.1.3",
+    "jsdom": "^16.2.2",
+    "prettier": "^2.0.5",
+    "ts-node": "^8.10.2",
+    "typescript": "^3.9.3"
+  },
+  "browserslist": [
+    "defaults",
+    "not IE 11",
+    "not IE_Mob 11",
+    "maintained node versions"
+  ]
 }
