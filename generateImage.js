@@ -16,8 +16,14 @@ const createServer = async (html, { serve }) => {
 
   const app = connect();
   app.use(
-    (request, response, next) =>
-      request.url === "/" ? response.end(html) : next()
+    (request, response, next) => {
+      if (request.url === "/") {
+        response.setHeader('Content-Type', 'text/html; charset=utf-8');
+        response.end(html);
+        return;
+      }
+      return next();
+    }
   );
 
   // serve all public paths
