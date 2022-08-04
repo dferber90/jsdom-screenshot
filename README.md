@@ -54,7 +54,7 @@ import { generateImage } from "jsdom-screenshot";
 
 // add some content to jsdom (this could also be React or any other library!)
 const div = document.createElement("div");
-div.innerText = "Hello World";
+div.innerHTML = "Hello World";
 document.body.appendChild(div);
 
 // take screenshot
