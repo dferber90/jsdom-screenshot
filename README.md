@@ -54,7 +54,7 @@ import { generateImage } from "jsdom-screenshot";
 
 // add some content to jsdom (this could also be React or any other library!)
 const div = document.createElement("div");
-div.innerText = "Hello World";
+div.innerHTML = "Hello World";
 document.body.appendChild(div);
 
 // take screenshot
@@ -116,7 +116,7 @@ options = {
   // Options used to take a screenshot (puppeteer.screenshot(options))
   screenshot: {},
   // An array of folders containing static files to be served
-  serve: ["pubilc", "assets"],
+  serve: ["public", "assets"],
   // Prints the jsdom markup to the console before taking the screenshot
   debug: true,
   // Wait for resources to be loaded before taking the screenshot
